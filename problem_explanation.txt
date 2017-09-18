@@ -1,0 +1,50 @@
+DESCRIPTION:
+
+This project mimics the function of a simple networks of nodes. The network is a 40x40 grid with 100 nodes and 20 noisemakers in it (all these are defined as macros, the user can change them). In the network there are nodes that want to send messages (and randomly create messages of they run out of their current stash). Each node can only send messages to their neighboring nodes when they are transmitting at the same frequency otherwise the message is lost (if the node sends it to a neighboring node but the neighboring node is not on the same frequency at the moment). Every few seconds a node decides if it wants to send a message and if it wants to change or remain at the same frequency (both are random decisions). Then it transmits and if there are nodes at the same frequence as the transmitting node, they get the message. The problem is that no 2 neighboring can transmit at the same time at any frequency (otherwise we would have collisions). 
+Also there are noisemakers which block the transmission capacities of the neighboring nodes for some period of time at all frequencies. Each noisemaker considers of it will block or not the neighboring nodes every now and then and at which frequency (all these are random decisions.
+
+Each noisemaker and node is its own thread. So the main problem is how to avoid collisions, while avoiding deadlocks etc(because we are using mutex 'es - locks to represent trasmission priorities etc)
+
+OUTPUT:
+
+First the pairs of neighboring nodes/ noisemakers show up at the console. That should help the user checking the correct pairs of text files to see if there were deadlock or not (and he would see there are no deadlocks).
+
+There is a text file associated with each thread and that includes nodes (regular nodes) and noisemakers. The name of the text file is the id of the node/noisemaker + the name regularnode/noisemaker. The text file shows all the events associated with the particular node/noisemaker , like when it sent/ received messages , to whom, from who, which time, at ehich frequency, when it was blocked etc.
+After the program runs for some time (lets say 1 minute), the user can see the output of neighboring nodes and noisemakers to see the sent messages to each other and how the problem constraints are satisfied, if one takes a look at the time of the sending of messages/ blocking, etc.
+
+
+SET UP:
+
+I have one struct node and one noisemaker struct.
+Each node has 3 locks: the sending lock, the message lock,and the regular lock.
+I have 2 global 1d arrays, one for the noisemakers and one for the regular nodes(or nodes)
+I have a global message counter and a lock for that counter
+At the start of the program each nodes determines its neighbors(in range) and the noisemakers find their nodes in range, and they store them in pointer arrays in their structs.
+Each node has a linked list of messages, that are the messages to be sent.
+Each node has an array of seen messages ids to see which messages to accept,
+
+
+HOW I AVOID COLLISSIONS:
+
+When a node wants to send a message, it acquires its own sending lock, its regular lock and the regular locks of its neighboring nodes, if these nodes are  at the same frequency. So the nodes in range will wait till their regular lock is free in order to send.
+Each time a node sends, it adds the message in the appropriate node, putting it into its message linked list. (only if the message is not in the seen message array of the receiving node)
+
+HOW I AVOID DEADLOCKS:
+
+I use placement order in the way i acquire the regular locks, which is the order the locks were put in the global array. When each node finds its neighbors, it goes through the global array, so the neighboring nodes are also in placement order and that is how their locks are acquired.
+
+HOW NOISEMAKERS WORK:
+
+When a noisemaker activates, it acquires the sending locks of the neighboring nodes, so that they cant send. If a node is already sending, the noisemaker waits till the sending lock is released and then grabs it. If a node tries to send while a noisemaker is already active, it waits till the chanll is free and then sends the message. The message is not lost.
+SO the use of the sending lock is basically for the noisemaker, not for the actual sending of the node.
+
+HOW MESSAGES WORK:
+
+Each node starts with 3 messages, but if it decides to send a message, it creates a new one and adds it to its linked list (so that for debugging we dont run out of messages). When a node decides to send a message from the linked list, it does not queue them, it picks a random index from the linked list and sends it.
+When a node sends a message to a node, it locks its message lock first (just for extra safety, not necesserily necessery)
+AFter a message is sent, the 'sent' and 'deleted' prints appear in the log. if you see just 'deleted' withouth 'sent', that means there were no listneing neighbors at the time, so the message was lost.
+
+
+SEMAPHORES/MUTEXES:
+The two solutions are almost identical, since I used binary semaphores instead of locks in the second solution, at the same places where I used mutexes in the first solution.
+
