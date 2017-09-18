@@ -1,3 +1,5 @@
+#author: spiros antonatos
+
 all: sol1_mutex
 
 sol1_mutex: sol1_mutex.o

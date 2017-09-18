@@ -1,6 +1,8 @@
 #ifndef SOL1_MUTEX_C
 #define SOL1_MUTEX_C
 
+//author: spiros antonatos
+
 #define max_num_messages_node 1000000
 #define max_num_nodes 10000
 

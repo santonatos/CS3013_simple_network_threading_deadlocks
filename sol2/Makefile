@@ -1,3 +1,5 @@
+#author: spiros antonatos
+
 all: sol2_sema
 
 sol2_sema: sol2_sema.o

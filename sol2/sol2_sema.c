@@ -28,16 +28,12 @@
 #define noisemaker_active_time 5 
 
 
-//array of nodes an[1000]
-
+//author: spiros antonatos
 	
 pNode array_nodes[max_num_nodes];
 pNoisemaker array_noisemakers[max_num_noisemakers];
-//pthread_mutex_t global_message_lock;
-//pthread_mutex_t global_thread_lock;
 sem_t global_message_sem;
 int global_message_counter;
-//node array_noisema
 
 
 
@@ -51,10 +47,7 @@ void create_file_node(struct regular_node* pnode){
 	//unique = itoa(pnode->id);
 	type = ".txt\0";
 
-	//unique = strncat(firstPart,unique,sizeof("regular_node10000000.txt"));
-	//filename = strncat(unique,filename,sizeof("regular_node10000000.txt"));
 	snprintf(filename,sizeof("regular_node10000000.txt"),"%s%d%s",firstPart,id,type);
-	//printf("%s\n",filename);
 	pnode->file = filename;
 
 	return;
@@ -76,11 +69,8 @@ void create_file_noisemaker(struct noisemaker_node* pnoisemaker){
 	//unique = itoa(pnode->id);
 	type = ".txt\0";
 
-	//unique = strncat(firstPart,unique,sizeof("regular_node10000000.txt"));
-	//filename = strncat(unique,filename,sizeof("regular_node10000000.txt"));
 	snprintf(filename,sizeof("noisemaker10000000.txt"),"%s%d%s",firstPart,id,type);
 	pnoisemaker->file = filename;
-	//printf("%s\n",filename);
 
 	return;
 
@@ -102,44 +92,6 @@ int main(){
 	pthread_mutex_t starting_lock2;
 	pthread_mutex_t starting_lock3;
 	sem_init(&global_message_sem,0,1);
-	//pthread_mutex_init(&(global_message_lock),NULL);
-	//pthread_mutex_init(&starting_lock1),NULL);
-	//pthread_mutex_init(&starting_lock2),NULL);
-	//pthread_mutex_init(&starting_lock3),NULL);
-	//
-	/*
-	node n;
-	for(int i = 0;i < num_nodes;i++){
-		array_nodes[i] = create_node()
-		
-	}
-
-	initialiaze_node_thread(&n1,20,20);
-	initialiaze_node_thread(&n1,25,25);
-	initialiaze_node_thread(&n1,90,90);
-	initialiaze_node_thread(&n1,40,35);
-	initialiaze_node_thread(&n1,30,35);
-	*/
-	//re
-
-	//place nodes on grid and on global array
-
-	//printf("start placing\n");
-/* TEST IMPLEMENTATION
-	place_node(&n1,&current_number_nodes,20,20);
-
-	//create_file_node(&n1);
-	//fprintf(n1.file,"node %d %d\n",n1.x,n1.y);
-	//fclose(n1.file);
-	//while(1);
-	place_node(&n2,&current_number_nodes,24,20);
-	place_node(&n3,&current_number_nodes,28,20);
-	place_node(&n4,&current_number_nodes,32,20);
-	place_node(&n5,&current_number_nodes,36,20);
-
-	place_noisemaker(&nm1,&current_number_noisemakers,22,20);
-	place_noisemaker(&nm2,&current_number_noisemakers,26,20);
-*/
 	for(i = 0;i < num_nodes;i++){
 		x = rand()%grid_width + 1;
 		y = rand()%grid_length + 1;
@@ -155,38 +107,10 @@ int main(){
 		place_noisemaker(*nm1,&current_number_noisemakers,x,y);
 		(*nm1)++;
 	}
-	//while(1);		
 
 	//fill the neighbor array for each node 
 	determine_neighbors();
 	determine_noisemaker_neighbors();
-	//fprintf(stdout,"first node x %d\n",array_noisemakers[0]->neighboring_regular_nodes[1]->x);
-	//fprintf(stdout,"STARTING NODE THREADS\n");
-	//start the threads for each node
-	//initialization_signal = 1; 
-	//pthread_mutext_lock(&starting_lock1);
-	//pthread_mutext_lock(&starting_lock2);
-	//pthread_mutext_lock(&starting_lock3);
-	//int i,j;
-	/*for(i = 0;i < num_nodes;i++){
-		pthread_mutex_lock(&(array_nodes[i]->starting_lock));
-	}*/
-
-/*TEST IMPLEMENTATION
-	initialize_noisemaker_thread(&nm1);
-	initialize_noisemaker_thread(&nm2);
-	initialize_node_thread(&n1);
-	initialize_node_thread(&n2);
-	initialize_node_thread(&n3);
-	//pthread_mutext_unlock(&starting_lock1);
-	//pthread_mutext_unlock(&starting_lock2);
-	//pthread_mutext_unlock(&starting_lock3);
-
-	//initialization_signal = 0;
-	initialize_node_thread(&n4);
-	initialize_node_thread(&n5);
-
-*/
 	for(j = 0;j < num_noisemakers;j++){
 		initialize_noisemaker_thread(array_noisemakers[j]);
 	}
@@ -198,12 +122,6 @@ int main(){
 
 
 	fprintf(stdout,"STARTING ALL THREADS\n");
-	/*for(i = 0;i < num_nodes;i++){
-		pthread_mutex_unlock(&(array_nodes[i]->starting_lock));
-	}
-	for(j = 0;j < num_noisemakers;j++){
-		pthread_mutex_unlock(&(array_noisemakers[j]->starting_lock));
-	}*/
 
 
 	while(1);
@@ -252,8 +170,6 @@ void place_node(pNode p_node,int * i,int pos_x,int pos_y){
 	p_node->current_neighboring_nodes = 0;
 	p_node->file = (char*)malloc(40*sizeof(char));
 	create_file_node(p_node);
-	//printf("here2\n");
-	//pthread_mutex_lock(&(global_message_lock));
 	p_node->message = (struct message*)malloc(sizeof(struct message));
 	struct message* newm = (struct message*)malloc(sizeof(struct message));
 	//printf("here3\n");
@@ -261,33 +177,24 @@ void place_node(pNode p_node,int * i,int pos_x,int pos_y){
 	newm->text = "message1\0";
 	global_message_counter++;
 	//printf("here3\n");
-	//newm->mid = global_message_counter;
 	newm->mid = global_message_counter;//rand() % 10;
 	//printf("here3\n");
 	newm->is_seen = 0;
 	p_node->message = newm;
 
 	struct message* newm2 = (struct message*)malloc(sizeof(struct message));
-	//printf("here3\n");
 	newm2->text = (char*)malloc(50*sizeof(char));//"message";
 	newm2->text = "message2\0";
 	global_message_counter++;
-	//printf("here3\n");
-	//newm->mid = global_message_counter;
 	newm2->mid = global_message_counter;//rand() % 10;
-	//printf("here3\n");
 	newm2->is_seen = 0;
 	add_message(p_node,newm2);
 
 	struct message* newm3 = (struct message*)malloc(sizeof(struct message));
-	//printf("here3\n");
 	newm3->text = (char*)malloc(50*sizeof(char));//"message";
 	newm3->text = "message3\0";
 	global_message_counter++;
-	//printf("here3\n");
-	//newm->mid = global_message_counter;
 	newm3->mid = global_message_counter;//rand() % 10;
-	//printf("here3\n");
 	newm3->is_seen = 0;
 	add_message(p_node,newm3);
 
@@ -300,14 +207,8 @@ void place_node(pNode p_node,int * i,int pos_x,int pos_y){
 	p_node->seen_messages[1] = p_node->message->next->mid;
 	p_node->seen_messages[2] = p_node->message->next->next->mid;
 	sem_init(&(p_node->sending_sem),0,1);
-	//pthread_mutex_init(&(p_node->starting_lock),NULL);
 	sem_init(&(p_node->sem1),0,1);
-	//pthread_mutex_init(&(p_node->lock6),NULL);
-	//pthread_mutex_init(&(p_node->lock11),NULL);
 	sem_init(&(p_node->message_sem),0,1);
-	//p_node->neighboring_nodes[p_node->current_neighboring_nodes] = p_node;
-
-	//fill global array
 
 	//fprintf(stdout,"node placed %d %d %d\n",p_node->message->mid,p_node->message->next->mid,p_node->message->next->next->mid);
 	return;
@@ -315,11 +216,9 @@ void place_node(pNode p_node,int * i,int pos_x,int pos_y){
 }
 
 void initialize_node_thread(pNode p_node){
-	//while(initialization_signal);
 	if(pthread_create(&(p_node->thread),NULL,&node_routine,p_node)){
 		fprintf(stdout,"error creating thead\n");
 	}
-	//fprintf(stdout,"initialized node and its thread\n");
 }
 
 void determine_neighbors(){
@@ -357,7 +256,6 @@ void determine_noisemaker_neighbors(){
 				pnm1->current_neighboring_nodes = pnm1->current_neighboring_nodes + 1;
 				//printf("nhbs node-noisemaker %d %d,  %d %d\n",pnm1->x,pnm1->y,pNode2->x,pNode2->y);
 				printf("neihboring node-noisemaker %d, %d\n",pNode2->id,pnm1->id);
-				//pNode1->neighboring_nodes
 			}
 		}		
 	}
@@ -367,8 +265,6 @@ void determine_noisemaker_neighbors(){
 }
 
 void* node_routine(void* p_node){
-	//pthread_mutex_lock(&(((pNode)p_node)->starting_lock));
-	//printf("before
 	//fprintf(stdout,"in routine %d %d\n",((pNode)p_node)->x,((pNode)p_node)->y);
 	//fprintf(stdout,"in routine %d %d\n",array_nodes[0]->x,array_nodes[0]->y);
 	((pNode)p_node)->current_frequency = 1;//rand() % 3;
@@ -385,14 +281,7 @@ void* node_routine(void* p_node){
 			if(difftime(end.tv_sec,start.tv_sec) >= dwell_duration){
 				not_terminate = 0;
 			}
-			/*if(difftime(end.tv_usec,start.tv_usec) >= dwell_duration){
-				not_terminate = 0;
-			}*/
-
-			//dwell_time = end.tv_sec - start.tv_sec;			
 		}
-		//change_frequency(p_node);//using dwell_probability
-		//int dwell_time = 0;
 		int not_terminate2 = 1;
 		gettimeofday(&start2,NULL);
 		while(not_terminate2){
@@ -401,10 +290,7 @@ void* node_routine(void* p_node){
 			if(difftime(end2.tv_sec,start2.tv_sec) >= talk_window_time){
 				not_terminate2 = 0;
 			}
-			/*if(difftime(end2.tv_usec,start2.tv_usec) >= talk_window_time){
-				not_terminate2 = 0;
-			}*/	
-	
+
 		}
 		if(send_message_or_not()){
 			try_to_send(p_node);
@@ -435,11 +321,6 @@ void* noisemaker_routine(void* p_noisemaker){
 			if(difftime(end.tv_sec,start.tv_sec) >= dwell_noisemakers){
 				not_terminate = 0;
 			}
-			/*if(difftime(end.tv_usec,start.tv_usec) >= dwell_noisemakers){
-				not_terminate = 0;
-			}*/
-
-			//dwell_time = end.tv_sec - start.tv_sec;			
 		}
 		change_noisemaker_frequency(p_noisemaker);//using dwell_noisemaker_probability
 
@@ -459,11 +340,6 @@ void* noisemaker_routine(void* p_noisemaker){
 			if(difftime(end2.tv_sec,start2.tv_sec) >= period){
 				not_terminate1 = 0;
 			}
-			/*if(difftime(end2.tv_usec,start2.tv_usec) >= period){
-				not_terminate1 = 0;
-			}*/
-
-			//dwell_time = end.tv_sec - start.tv_sec;			
 		}
 		if(interfere){
 			unblock_channel(p_noisemaker);
@@ -558,35 +434,19 @@ void change_noisemaker_frequency(pNoisemaker p_noisemaker){
 }
 void try_to_send(pNode p_node){
 	create_and_add(p_node);
-	//fprintf(f,"waiting for sending lock\n");
-	//fclose(f);
 	sem_wait(&(p_node->sending_sem));
-	//f = fopen(p_node->file,"a+");
-	//fprintf(f,"acquired sending lock\n");
-	//fclose(f);
 	send_message(p_node);
 	sem_post(&(p_node->sending_sem));
-	//FILE* f = fopen(p_node->file,"a+");
 	print_messages(p_node);
-	//f = fopen(p_node->file,"a+");
-	//fprintf(f,"released sending lock\n");
-	//fclose(f);
 }
 
 
 void send_message(pNode p_node){
 	//fprintf(stdout,"sending message\n");
-	//int random_message_number;
 	if(p_node->current_number_messages <= 0){
-		//fprintf(stdout," no morre messages to send by node %d %d\n",p_node->x,p_node->y);
-		//return;
 	}else{
-	//if(p_node->current_frequency == 1){
 		for(int i = 0;i < p_node->current_neighboring_nodes;i++){
-			//fprintf(stderr,"node %d %d waits for lock1 of node %d %d\n",p_node->x,p_node->y,p_node->neighboring_nodes[i]->x,p_node->neighboring_nodes[i]->y);
-			//if(p_node != 
 			sem_wait(&(p_node->neighboring_nodes[i]->sem1));
-			//fprintf(stderr,"node %d %d holds lock1 of node %d %d\n",p_node->x,p_node->y,p_node->neighboring_nodes[i]->x,p_node->neighboring_nodes[i]->y);
 		}
 		int j = p_node->current_number_messages;
 		int random_message_number;
@@ -609,7 +469,6 @@ void send_message(pNode p_node){
 
 
 	struct timeval start,end;
-		//int dwell_time = 0;
 		int not_terminate = 1;
 		gettimeofday(&start,NULL);
 		while(not_terminate){
@@ -618,7 +477,6 @@ void send_message(pNode p_node){
 			if(difftime(end.tv_sec,start.tv_sec) >= transmission_time){
 				not_terminate = 0;
 			}
-			//dwell_time = end.tv_sec - start.tv_sec;			
 		}
 
 }
@@ -626,8 +484,7 @@ void send_message(pNode p_node){
 void broadcast(pNode p_node,struct message* message_to_send,int random_number){
 	struct timeval time;
 	for(int i = 0;i < p_node->current_neighboring_nodes;i++){
-		if(/*(p_node != p_node->neighboring_nodes[i]) &&*/ p_node->neighboring_nodes[i]->current_frequency == p_node->current_frequency && is_not_seen(p_node->neighboring_nodes[i],message_to_send)){
-			//fprintf(stderr,"node %d %d waits for message lock of node %d %d\n",p_node->x,p_node->y,p_node->neighboring_nodes[i]->x,p_node->neighboring_nodes[i]->y);
+		if(p_node->neighboring_nodes[i]->current_frequency == p_node->current_frequency && is_not_seen(p_node->neighboring_nodes[i],message_to_send)){
 
 			sem_wait(&(p_node->neighboring_nodes[i]->message_sem));
 
@@ -711,10 +568,6 @@ void add_message(struct regular_node* pnode,struct message* pmessage_add){
 		last_message->next->text = pmessage_add->text;
 		last_message->next->mid = pmessage_add->mid;
 		last_message->next->previous = last_message;
-		//last_message->next = pmessage_add;
-
-		//pmessage_add->previous = last_message; 
-		//fprintf(stdout,"added message here2\n");
 	}
 	//fprintf(stdout,"somehow added message\n");
 	pnode->current_number_messages = pnode->current_number_messages + 1;
@@ -817,12 +670,10 @@ void print_messages(struct regular_node* pnode){
 void block_channel(pNoisemaker p_noisemaker){
 	//fprintf(stdout,"BLOCKING CHANELL by %d %d\n",p_noisemaker->x,p_noisemaker->y);
 	int i;
-	//int currently_blocked[p_noisemaker->current_neighboring_nodes];
 	int frequency = p_noisemaker->current_frequency;
 	struct timeval time;
 	for(i = 0;i < p_noisemaker->current_neighboring_nodes;i++){
 		if(frequency == p_noisemaker->neighboring_regular_nodes[i]->current_frequency){
-			//fprintf(stdout,"here %d %d %d\n",p_noisemaker->current_neighboring_nodes, p_noisemaker->neighboring_regular_nodes[i]->x,p_noisemaker->neighboring_regular_nodes[i]->y);
 			sem_wait(&(p_noisemaker->neighboring_regular_nodes[i]->sending_sem));
 			p_noisemaker->neighboring_regular_nodes[i]->blocked = p_noisemaker->id;
 
@@ -845,7 +696,6 @@ void unblock_channel(pNoisemaker p_noisemaker){
 	int frequency = p_noisemaker->current_frequency;
 	struct timeval time;
 	for(i = 0;i < p_noisemaker->current_neighboring_nodes;i++){
-		//if(frequency == 1){
 
 			//fprintf(stdout,"UNBLOCKING CHANELL for %d %d\n",p_noisemaker->neighboring_regular_nodes[i]->x,p_noisemaker->neighboring_regular_nodes[i]->y);
 		if(p_noisemaker->neighboring_regular_nodes[i]->blocked == p_noisemaker->id){
@@ -859,7 +709,6 @@ void unblock_channel(pNoisemaker p_noisemaker){
 			p_noisemaker->neighboring_regular_nodes[i]->blocked = -10;
 			sem_post(&(p_noisemaker->neighboring_regular_nodes[i]->sending_sem));
 
-			//fclose(p_noisemaker->neighboring_regular_nodes[i]->file);
 		}
 	}
 

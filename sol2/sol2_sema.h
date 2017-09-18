@@ -1,7 +1,13 @@
+#ifndef SOL2_SEMA_H
+#define SOL2_SEMA_H
+
 
 #define max_num_messages_node 1000000
 #define max_num_nodes 10000
 //linked list of messages
+
+//author : spiros antonatos
+
 typedef struct message{
 	//char text[50]; //= create_text();
 	char* text;
@@ -90,7 +96,7 @@ void create_file_noisemaker(struct noisemaker_node* pnoisemaker);
 int interfere_or_not();
 int send_message_or_not();
 
-
+#endif
 
 
 
